@@ -28,7 +28,7 @@ class OnboardingContent extends StatelessWidget {
       child: Column(
         children: [
           // ---------- Image ----------
-          Container(
+          SizedBox(
             width: double.infinity,
             height: 540.h,
             child: Stack(

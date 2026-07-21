@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:nabdh/Core/Features/ClientHome/Presentation/View/AllServicesPage.dart';
 import 'dart:ui';
+import 'package:nabdh/Core/Util/app_colors.dart';
+
+import 'package:nabdh/Core/helper/my_navigator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,45 +15,70 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static const Color primaryTeal = Color(0xFF00685F);
-  static const Color backgroundGrey = Color(0xFFF7F8FA);
-  static const Color borderGrey = Color(0xFFE3E6EA);
-  static const Color hintGrey = Color(0xFF3E4947);
-
   int selectedNavIndex = 0; // Services tab active
-
+  int? selectedServiceIndex;
   final List<Map<String, dynamic>> services = [
     {
       'title': 'تمريض منزلي',
-      'icon': SvgPicture.asset('assets/تمريض منزلي.svg'),
-      'color': primaryTeal,
+      'icon': SvgPicture.asset(
+        'assets/تمريض منزلي.svg',
+        width: 30.w,
+        height: 30.h,
+        fit: BoxFit.contain,
+      ),
+      'color': AppColors.primary,
     },
     {
       'title': 'حقن و محاليل',
-      'icon': SvgPicture.asset('assets/حقن و محاليل.svg'),
-      'color': primaryTeal,
+      'icon': SvgPicture.asset(
+        'assets/حقن و محاليل.svg',
+        width: 30.w,
+        height: 30.h,
+        fit: BoxFit.contain,
+      ),
+      'color': AppColors.primary,
     },
     {
       'title': 'تغيير الضمادات',
-      'icon': SvgPicture.asset('assets/تغير ضماضات.svg'),
-      'color': Colors.grey[300],
+      'icon': SvgPicture.asset(
+        'assets/تغير ضماضات.svg',
+        width: 30.w,
+        height: 30.h,
+        fit: BoxFit.contain,
+      ),
+      'color': AppColors.primary,
     },
 
     {
       'title': 'رعاية كبار السن',
-      'icon': SvgPicture.asset('assets/رعايه كبار السن.svg'),
-      'color': primaryTeal,
+      'icon': SvgPicture.asset(
+        'assets/رعايه كبار السن.svg',
+        width: 30.w,
+        height: 30.h,
+        fit: BoxFit.contain,
+      ),
+      'color': AppColors.primary,
     },
 
     {
       'title': 'رعاية ما بعد العمليات',
-      'icon': SvgPicture.asset('assets/رعايه ما بعد العمليه.svg'),
-      'color': Colors.grey[300],
+      'icon': SvgPicture.asset(
+        'assets/رعايه ما بعد العمليه.svg',
+        width: 30.w,
+        height: 30.h,
+        fit: BoxFit.contain,
+      ),
+      'color': AppColors.primary,
     },
     {
       'title': 'متابعة الحالات المزمنة',
-      'icon': SvgPicture.asset('assets/متابعه الحالات المزمنه.svg'),
-      'color': Colors.red[300],
+      'icon': SvgPicture.asset(
+        'assets/متابعه الحالات المزمنه.svg',
+        width: 30.w,
+        height: 30.h,
+        fit: BoxFit.contain,
+      ),
+      'color': AppColors.primary,
     },
   ];
 
@@ -73,8 +102,8 @@ class _HomePageState extends State<HomePage> {
           title: Text(
             'NABDH',
             style: TextStyle(
-              color: primaryTeal,
-              fontSize: 28.sp,
+              color: AppColors.primary,
+              fontSize: 20.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -120,7 +149,7 @@ class _HomePageState extends State<HomePage> {
                 'كيف يمكننا مساعدتك اليوم؟',
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: hintGrey,
+                  color: AppColors.hintGrey,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -131,13 +160,19 @@ class _HomePageState extends State<HomePage> {
                 textDirection: TextDirection.rtl,
                 decoration: InputDecoration(
                   hintText: 'ابحث عن خدمة تمريضية',
-                  hintStyle: TextStyle(color: hintGrey, fontSize: 16.sp),
-                  prefixIcon: Icon(Icons.search, color: hintGrey),
+                  hintStyle: TextStyle(
+                    color: AppColors.hintGrey,
+                    fontSize: 16.sp,
+                  ),
+                  prefixIcon: Icon(Icons.search, color: AppColors.hintGrey),
                   filled: true,
-                  fillColor: backgroundGrey,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide(color: borderGrey, width: 1),
+                    borderSide: BorderSide(
+                      color: AppColors.borderGrey,
+                      width: 1,
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.r),
@@ -163,12 +198,17 @@ class _HomePageState extends State<HomePage> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  Text(
-                    'عرض الكل',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: primaryTeal,
-                      fontWeight: FontWeight.w600,
+                  GestureDetector(
+                    onTap: () {
+                      goTo(context, page: AllServicesPage());
+                    },
+                    child: Text(
+                      'عرض الكل',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
@@ -187,27 +227,36 @@ class _HomePageState extends State<HomePage> {
                 ),
                 itemCount: services.length,
                 itemBuilder: (context, index) {
+                  final isSelected = selectedServiceIndex == index;
+
                   return GestureDetector(
                     onTap: () {
-                      // Handle service tap
+                      setState(() {
+                        selectedServiceIndex = index;
+                      });
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isSelected ? Color(0xffF0F7F6) : Colors.white,
                         borderRadius: BorderRadius.circular(16.r),
-                        border: Border.all(color: borderGrey, width: 1),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.borderGrey,
+                          width: 1,
+                        ),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
-                            width: 50.w,
-                            height: 50.h,
+                            width: 70.w,
+                            height: 70.h,
                             decoration: BoxDecoration(
-                              color: services[index]['color'],
+                              color: Color(0xffA1F1E5).withOpacity(0.2),
                               shape: BoxShape.circle,
                             ),
-                            child: services[index]['icon'],
+                            child: Center(child: services[index]['icon']),
                           ),
                           SizedBox(height: 12.h),
                           Text(
@@ -358,7 +407,9 @@ class _HomePageState extends State<HomePage> {
                       curve: Curves.easeOut,
                       height: 62.h,
                       decoration: BoxDecoration(
-                        color: isSelected ? primaryTeal : Colors.transparent,
+                        color: isSelected
+                            ? AppColors.primary
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(999.r),
                       ),
                       child: Column(

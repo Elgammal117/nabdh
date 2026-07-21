@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nabdh/Auth/Sign_in.dart';
+import 'package:nabdh/Core/Features/Auth/Presentation/View/Sign_in.dart';
 import 'Widgets/Introduction.dart';
 
 class OnboardingPageData {

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:nabdh/Auth/Otp.dart';
-import 'package:nabdh/Auth/Sign_in.dart';
-import 'package:nabdh/Auth/Sign_up.dart';
-import 'package:nabdh/Client/Home_page.dart';
-import 'package:nabdh/Nurse/Data_check.dart';
-import 'package:nabdh/Splash_Screen.dart';
+import 'package:nabdh/Core/Features/Auth/Presentation/View/Sign_in.dart';
+import 'package:nabdh/Core/Features/ClientHome/Presentation/View/UserHome.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nabdh/Core/Util/app_colors.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,9 +24,9 @@ class MyApp extends StatelessWidget {
             fontFamily: 'Alexandria',
 
             scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
-            colorScheme: ColorScheme.fromSeed(seedColor: Color(0xff00685F)),
+            colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
           ),
-          home: DataCheckPage(),
+          home: HomePage(),
         );
       },
     );
