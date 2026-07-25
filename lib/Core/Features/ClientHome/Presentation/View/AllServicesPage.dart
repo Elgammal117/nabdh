@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:nabdh/Core/Features/ClientHome/Presentation/View/FindingNurse.dart';
+import 'package:nabdh/Core/Features/ClientHome/Presentation/View/Location.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
+import 'package:nabdh/Core/helper/my_navigator.dart';
 
 class AllServicesPage extends StatefulWidget {
   const AllServicesPage({super.key});
@@ -218,12 +221,17 @@ class _AllServicesPageState extends State<AllServicesPage> {
                     Positioned(
                       top: 0,
                       left: 0,
-                      child: Text(
-                        'تغير',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w400,
+                      child: GestureDetector(
+                        onTap: () {
+                          goTo(context, page: LocationPage());
+                        },
+                        child: Text(
+                          'تغير',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
                     ),
@@ -394,26 +402,31 @@ class _AllServicesPageState extends State<AllServicesPage> {
               SizedBox(height: 72.h),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  height: 60.h,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.send, color: Colors.white, size: 20.sp),
-                      SizedBox(width: 8.w),
-                      Text(
-                        'ارسال الطلب',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
+                child: GestureDetector(
+                  onTap: () {
+                    goTo(context, page: FindingNursePage());
+                  },
+                  child: Container(
+                    height: 60.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.send, color: Colors.white, size: 20.sp),
+                        SizedBox(width: 8.w),
+                        Text(
+                          'ارسال الطلب',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

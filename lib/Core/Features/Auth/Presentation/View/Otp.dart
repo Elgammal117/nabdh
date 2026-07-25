@@ -10,6 +10,7 @@ import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/NumVerifyCubit.dart/
 import 'package:nabdh/Core/Features/ClientHome/Presentation/View/UserHome.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 import 'package:nabdh/Core/helper/my_navigator.dart' as my_nav;
+import 'package:nabdh/Core/helper/my_navigator.dart';
 import 'package:nabdh/Core/helper/show_snack_bar.dart';
 
 class OtpVerification extends StatefulWidget {
@@ -117,11 +118,7 @@ class _OtpVerificationState extends State<OtpVerification> {
               status: SnackBarStatus.success,
             );
 
-            my_nav.goTo(
-              context,
-              page: HomePage(),
-              state: my_nav.NavigatorState.pushRemove,
-            );
+            goTo(context, page: HomePage(), state: NavAction.pushRemove);
           } else if (state is NumVerifyCubitError) {
             showCustomSnackBar(
               context,

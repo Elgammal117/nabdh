@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:dio/dio.dart';
 import 'package:nabdh/Core/Features/Auth/Data/Models/AuthModels.dart';
 import 'package:nabdh/dio_helper.dart';
 

@@ -6,7 +6,7 @@ class NumVerifyCubit extends Cubit<NumVerifyCubitState> {
   NumVerifyCubit() : super(NumVerifyCubitInitial());
   static NumVerifyCubit get(context) => BlocProvider.of(context);
   // كان ممكن اعدل ال otpverifylogic بحيث لما اتدعيها في ال screen تاخد الرقم و كدا اقدر استخدمها في ال resend بس ال ai ليه رأي تاني
-  otpverifylogic({
+  Future<void> otpverifylogic({
     required String phoneNumber,
     required String otp,
     required String type,

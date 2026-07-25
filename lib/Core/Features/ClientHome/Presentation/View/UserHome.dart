@@ -5,7 +5,7 @@ import 'package:nabdh/Core/Features/ClientHome/Presentation/View/AllServicesPage
 import 'dart:ui';
 import 'package:nabdh/Core/Util/app_colors.dart';
 
-import 'package:nabdh/Core/helper/my_navigator.dart';
+import 'package:nabdh/Core/helper/my_navigator.dart' hide NavigatorState;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -389,56 +389,64 @@ class _HomePageState extends State<HomePage> {
           top: false,
           child: Container(
             color: Colors.white,
-            padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 16.h),
-            child: Row(
-              children: List.generate(navItems.length, (index) {
-                final navItem = navItems[index];
-                final isSelected = selectedNavIndex == index;
+            padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 8.h),
+            child: SizedBox(
+              height: 56.h,
+              child: Row(
+                children: List.generate(navItems.length, (index) {
+                  final navItem = navItems[index];
+                  final isSelected = selectedNavIndex == index;
 
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedNavIndex = index;
-                      });
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 220),
-                      curve: Curves.easeOut,
-                      height: 62.h,
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primary
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(999.r),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            navItem.icon,
-                            size: 26.sp,
-                            color: isSelected
-                                ? Color(0xff93E4D8)
-                                : Colors.grey[500],
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedNavIndex = index;
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 220),
+                        curve: Curves.easeOut,
+                        height: 56.h,
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? AppColors.primary
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(999.r),
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                navItem.icon,
+                                size: 22.sp,
+                                color: isSelected
+                                    ? Color(0xff93E4D8)
+                                    : Colors.grey[500],
+                              ),
+                              SizedBox(height: 2.h),
+                              Text(
+                                navItem.label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  height: 1,
+                                  fontWeight: FontWeight.w500,
+                                  color: isSelected
+                                      ? Color(0xff93E4D8)
+                                      : Colors.grey[500],
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            navItem.label,
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              color: isSelected
-                                  ? Color(0xff93E4D8)
-                                  : Colors.grey[500],
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              }),
+                  );
+                }),
+              ),
             ),
           ),
         ),
