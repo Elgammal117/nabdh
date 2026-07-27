@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:nabdh/Core/Features/ClientHome/Presentation/View/FindingNurse.dart';
-import 'package:nabdh/Core/Features/ClientHome/Presentation/View/Location.dart';
+import 'package:nabdh/Core/Features/find_nursing/Presentation/View/FindingNurse.dart';
+import 'package:nabdh/Core/Features/location/Presentation/View/Location.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 import 'package:nabdh/Core/helper/my_navigator.dart';
 

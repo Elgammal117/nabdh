@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nabdh/Core/Features/ClientHome/Presentation/View/UserHome.dart';
+import 'package:nabdh/Core/Features/NurseTracking/Presentation/View/NurseTracking.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 import 'package:nabdh/Core/helper/my_navigator.dart';
 import 'package:nabdh/Core/helper/show_snack_bar.dart';
@@ -395,6 +396,7 @@ class _ConfirmedBookingPageState extends State<ConfirmedBookingPage> {
                             text: 'جاري فتح خريطة تتبع الممرض...',
                             status: SnackBarStatus.info,
                           );
+                          goTo(context, page: NurseTrackingPage());
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
