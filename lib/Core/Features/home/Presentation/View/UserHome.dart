@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:nabdh/Core/Features/Message/Presentation/View/Message.dart';
+import 'package:nabdh/Core/Features/MyBooking/Presentation/View/MyBooking.dart';
 import 'package:nabdh/Core/Features/request_service/Presentation/View/AllServicesPage.dart';
 import 'dart:ui';
 import 'package:nabdh/Core/Util/app_colors.dart';
@@ -83,7 +85,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<_NavItemData> navItems = const [
     _NavItemData(icon: Icons.home, label: 'الرئيسية'),
-    _NavItemData(icon: Icons.calendar_month, label: 'طلباتي'),
+    _NavItemData(icon: Icons.calendar_month, label: 'الحجوزات'),
     _NavItemData(icon: Icons.chat_bubble_outline, label: 'الرسائل'),
     _NavItemData(icon: Icons.person_outline, label: 'حسابي'),
   ];
@@ -93,37 +95,42 @@ class _HomePageState extends State<HomePage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
-          elevation: 0,
-
-          title: Text(
-            'NABDH',
-            style: TextStyle(
-              color: AppColors.primary,
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(
-                Icons.notifications_none,
-                color: Colors.black87,
-                size: 24.sp,
+        appBar: (selectedNavIndex == 1 || selectedNavIndex == 2)
+            ? null
+            : AppBar(
+                automaticallyImplyLeading: false,
+                backgroundColor: Colors.white,
+                elevation: 0,
+                title: Text(
+                  'NABDH',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                actions: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.notifications_none,
+                      color: Colors.black87,
+                      size: 24.sp,
+                    ),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.menu, color: Colors.black87, size: 24.sp),
+                    onPressed: () {},
+                  ),
+                ],
               ),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.menu, color: Colors.black87, size: 24.sp),
-              onPressed: () {},
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-          child: Column(
+        body: selectedNavIndex == 1
+            ? const MyBookingPage(showBottomNav: false)
+            : selectedNavIndex == 2
+                ? const MessagePage(showBottomNav: false)
+                : SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+                    child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ---------- Greeting Section ----------

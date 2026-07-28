@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:nabdh/Core/Features/ClientHome/Presentation/View/UserHome.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
+import 'package:nabdh/Core/Features/payment/Presentation/View/Payment.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 
 void main() {

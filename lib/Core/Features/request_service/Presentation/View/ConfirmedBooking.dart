@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nabdh/Core/Features/ClientHome/Presentation/View/UserHome.dart';
-import 'package:nabdh/Core/Features/NurseTracking/Presentation/View/NurseTracking.dart';
+import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
+import 'package:nabdh/Core/Features/live_tracking/Presentation/View/NurseTracking.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 import 'package:nabdh/Core/helper/my_navigator.dart';
 import 'package:nabdh/Core/helper/show_snack_bar.dart';

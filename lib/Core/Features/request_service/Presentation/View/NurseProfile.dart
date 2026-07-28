@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nabdh/Core/Features/ClientHome/Presentation/View/ConfirmedBooking.dart';
+import 'package:nabdh/Core/Features/request_service/Presentation/View/ConfirmedBooking.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 import 'package:nabdh/Core/helper/my_navigator.dart';
 import 'package:nabdh/Core/helper/show_snack_bar.dart';
@@ -83,7 +83,10 @@ class _NurseProfilePageState extends State<NurseProfilePage> {
               // ---------- Main Scrollable Content ----------
               Expanded(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 8.h,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -116,17 +119,19 @@ class _NurseProfilePageState extends State<NurseProfilePage> {
                                     width: 90.w,
                                     height: 90.w,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        Container(
-                                      width: 90.w,
-                                      height: 90.w,
-                                      color: AppColors.primary.withOpacity(0.1),
-                                      child: Icon(
-                                        Icons.person,
-                                        color: AppColors.primary,
-                                        size: 50.sp,
-                                      ),
-                                    ),
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            Container(
+                                              width: 90.w,
+                                              height: 90.w,
+                                              color: AppColors.primary
+                                                  .withOpacity(0.1),
+                                              child: Icon(
+                                                Icons.person,
+                                                color: AppColors.primary,
+                                                size: 50.sp,
+                                              ),
+                                            ),
                                   ),
                                 ),
                                 Positioned(
@@ -379,7 +384,9 @@ class _NurseProfilePageState extends State<NurseProfilePage> {
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(20.r),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.06),
@@ -511,7 +518,10 @@ class _NurseProfilePageState extends State<NurseProfilePage> {
                       height: 48.h,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: AppColors.borderGrey, width: 1.2),
+                          side: BorderSide(
+                            color: AppColors.borderGrey,
+                            width: 1.2,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14.r),
                           ),
@@ -547,17 +557,11 @@ class _NurseProfilePageState extends State<NurseProfilePage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColors.borderGrey.withOpacity(0.6),
-        ),
+        border: Border.all(color: AppColors.borderGrey.withOpacity(0.6)),
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: AppColors.primary,
-            size: 24.sp,
-          ),
+          Icon(icon, color: AppColors.primary, size: 24.sp),
           SizedBox(height: 8.h),
           Text(
             value,
@@ -592,9 +596,7 @@ class _NurseProfilePageState extends State<NurseProfilePage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(
-          color: AppColors.borderGrey.withOpacity(0.6),
-        ),
+        border: Border.all(color: AppColors.borderGrey.withOpacity(0.6)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -608,11 +610,7 @@ class _NurseProfilePageState extends State<NurseProfilePage> {
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(10.r),
                 ),
-                child: Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 22.sp,
-                ),
+                child: Icon(icon, color: Colors.white, size: 22.sp),
               ),
               SizedBox(width: 12.w),
               Column(
@@ -640,11 +638,7 @@ class _NurseProfilePageState extends State<NurseProfilePage> {
             ],
           ),
           if (isVerified)
-            Icon(
-              Icons.check_circle,
-              color: AppColors.primary,
-              size: 22.sp,
-            ),
+            Icon(Icons.check_circle, color: AppColors.primary, size: 22.sp),
         ],
       ),
     );
@@ -662,9 +656,7 @@ class _NurseProfilePageState extends State<NurseProfilePage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColors.borderGrey.withOpacity(0.6),
-        ),
+        border: Border.all(color: AppColors.borderGrey.withOpacity(0.6)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nabdh/Core/Features/ClientHome/Presentation/View/Offers.dart';
+import 'package:nabdh/Core/Features/request_service/Presentation/View/Offers.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 import 'package:nabdh/Core/helper/my_navigator.dart';
 
