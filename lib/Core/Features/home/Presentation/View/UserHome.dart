@@ -97,7 +97,10 @@ class _HomePageState extends State<HomePage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: (selectedNavIndex == 1 || selectedNavIndex == 2 || selectedNavIndex == 3)
+        appBar:
+            (selectedNavIndex == 1 ||
+                selectedNavIndex == 2 ||
+                selectedNavIndex == 3)
             ? null
             : AppBar(
                 automaticallyImplyLeading: false,
@@ -303,7 +306,7 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Image.asset(
                             'assets/Promo_bg.png',
-                            height: 200.h,
+                            height: 250.h,
                             width: double.infinity,
                             fit: BoxFit.cover,
                           ),
@@ -312,7 +315,7 @@ class _HomePageState extends State<HomePage> {
                           BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
                             child: Container(
-                              height: 200.h,
+                              height: 250.h,
                               width: double.infinity,
                               color: Colors.transparent,
                             ),
@@ -320,7 +323,7 @@ class _HomePageState extends State<HomePage> {
 
                           // gradient layer
                           Container(
-                            height: 200.h,
+                            height: 250.h,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 begin: Alignment.centerLeft,
