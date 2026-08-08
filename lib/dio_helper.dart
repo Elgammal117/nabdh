@@ -1,11 +1,13 @@
 import 'package:dio/dio.dart';
 
-Dio dio = Dio(BaseOptions(
-  baseUrl: 'http://localhost:3000/api/v1/',
-  connectTimeout: const Duration(seconds: 30),
-  receiveTimeout: const Duration(seconds: 30),
-  sendTimeout: const Duration(seconds: 30),
-));
+Dio dio = Dio(
+  BaseOptions(
+    baseUrl: 'http://localhost:3000/api/v1/',
+    connectTimeout: const Duration(seconds: 30),
+    receiveTimeout: const Duration(seconds: 30),
+    sendTimeout: const Duration(seconds: 30),
+  ),
+);
 String? accessToken;
 
 String handleDioException(Object e) {
