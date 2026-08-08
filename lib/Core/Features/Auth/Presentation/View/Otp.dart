@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/LoginCubit/LoginCubit.dart';
 import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/NumVerifyCubit.dart/NumVerifyCubit.dart';
 import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/NumVerifyCubit.dart/NumVerifyState.dart';
+import 'package:nabdh/Core/Features/Auth/Presentation/View/Sign_up.dart';
 import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 import 'package:nabdh/Core/helper/my_navigator.dart' as my_nav;
@@ -16,12 +17,12 @@ import 'package:nabdh/Core/helper/show_snack_bar.dart';
 class OtpVerification extends StatefulWidget {
   const OtpVerification({
     super.key,
-    required this.phoneNumber,
+    required this.email,
     required this.type,
     this.deviceinfo,
   });
 
-  final String phoneNumber;
+  final String email;
   final String type;
   final Map<String, dynamic>? deviceinfo;
 
@@ -117,8 +118,18 @@ class _OtpVerificationState extends State<OtpVerification> {
               text: state.message,
               status: SnackBarStatus.success,
             );
+            if (state.isNewUser) {
+              print(state.accessToken);
+              goTo(
+                context,
+                page: Signup(accessToken: state.accessToken),
+                state: NavAction.pushRemove,
+              );
+            } else {
+              print(state.accessToken);
 
-            goTo(context, page: HomePage(), state: NavAction.pushRemove);
+              goTo(context, page: HomePage(), state: NavAction.pushRemove);
+            }
           } else if (state is NumVerifyCubitError) {
             showCustomSnackBar(
               context,
@@ -196,7 +207,7 @@ class _OtpVerificationState extends State<OtpVerification> {
                             text: 'تم إرسال رمز التحقق إلى رقم الهاتف: ',
                           ),
                           TextSpan(
-                            text: widget.phoneNumber,
+                            text: widget.email,
                             style: TextStyle(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w700,
@@ -263,10 +274,9 @@ class _OtpVerificationState extends State<OtpVerification> {
                             return;
                           }
 
-                          final sent = await SigninCubit.get(context).resendOtp(
-                            phoneNumber: widget.phoneNumber,
-                            type: widget.type,
-                          );
+                          final sent = await SigninCubit.get(
+                            context,
+                          ).resendOtp(email: widget.email, type: widget.type);
 
                           if (!context.mounted) return;
 
@@ -322,12 +332,12 @@ class _OtpVerificationState extends State<OtpVerification> {
                       child: ElevatedButton(
                         onPressed: () {
                           code = _controllers.map((c) => c.text).join();
+                          print('this is code : $code');
                           if (code.length < _otpLength) return;
                           NumVerifyCubit.get(context).otpverifylogic(
-                            phoneNumber: widget.phoneNumber,
+                            email: widget.email,
                             otp: code,
                             type: widget.type,
-                            deviceinfo: widget.deviceinfo,
                           );
                         },
                         style: ElevatedButton.styleFrom(

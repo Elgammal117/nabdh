@@ -143,9 +143,9 @@ class Signin extends StatelessWidget {
                   ),
                   SizedBox(height: 24.h),
 
-                  // ---------- Phone label ----------
+                  // ---------- Email label ----------
                   Text(
-                    'رقم الهاتف المحمول',
+                    'البريد الإلكتروني',
                     textAlign: TextAlign.right,
                     style: TextStyle(
                       color: Color(0xff3E4947),
@@ -155,7 +155,7 @@ class Signin extends StatelessWidget {
                   ),
                   SizedBox(height: 24.h),
 
-                  // ---------- Phone input ----------
+                  // ---------- Email input ----------
                   Container(
                     height: 60.h,
                     decoration: BoxDecoration(
@@ -163,45 +163,23 @@ class Signin extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16.r),
                       border: Border.all(color: AppColors.borderGrey),
                     ),
-                    child: Row(
-                      children: [
-                        SizedBox(width: 14.w),
-                        Container(
-                          width: 1.w,
-                          height: 26.h,
-                          color: AppColors.borderGrey,
+                    child: TextFormField(
+                      controller: SigninCubit.get(context).emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      textAlign: TextAlign.right,
+                      style: TextStyle(fontSize: 16.sp),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 14.w,
+                          vertical: 16.h,
                         ),
-                        Expanded(
-                          child: TextFormField(
-                            controller: SigninCubit.get(
-                              context,
-                            ).phoneController,
-                            keyboardType: TextInputType.phone,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 16.sp),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 14.w,
-                              ),
-                              hintText: 'ادخل رقم الهاتف المحمول',
-                              hintStyle: TextStyle(
-                                color: AppColors.hintGrey.withOpacity(0.6),
-                                fontSize: 15.sp,
-                              ),
-                            ),
-                          ),
+                        hintText: 'ادخل البريد الإلكتروني',
+                        hintStyle: TextStyle(
+                          color: AppColors.hintGrey.withOpacity(0.6),
+                          fontSize: 15.sp,
                         ),
-                        Text(
-                          '20+',
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        SizedBox(width: 18.w),
-                      ],
+                      ),
                     ),
                   ),
                   SizedBox(height: 24.h),
@@ -213,8 +191,10 @@ class Signin extends StatelessWidget {
                       onPressed: state is Loading
                           ? null
                           : () async {
+                              print("1");
                               final cubit = SigninCubit.get(context);
                               final sent = await cubit.signinlogic();
+                              print("done");
 
                               if (!context.mounted) return;
 
@@ -222,8 +202,7 @@ class Signin extends StatelessWidget {
                                 goTo(
                                   context,
                                   page: OtpVerification(
-                                    phoneNumber:
-                                        '+20${cubit.phoneController.text}',
+                                    email: cubit.emailController.text,
                                     type: cubit.type,
                                   ),
                                 );

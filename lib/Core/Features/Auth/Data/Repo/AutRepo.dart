@@ -3,14 +3,17 @@ import 'package:nabdh/Core/Features/Auth/Data/Models/AuthModels.dart';
 import 'package:nabdh/dio_helper.dart';
 
 class AuthRepo {
-  Future<Either<String, String>> numberotpsend({
-    required String phoneNumber,
+  Future<Either<String, String>> emailotpsend({
+    required String email,
     required String role,
   }) async {
     try {
+      print("imhere");
+      print(email);
+      print(role);
       var response = await dio.post(
         'auth/otp/send',
-        data: {'phone': phoneNumber, 'role': role},
+        data: {'email': email, 'role': role},
       );
 
       var mapResponse = response.data as Map<String, dynamic>;
@@ -22,29 +25,27 @@ class AuthRepo {
     }
   }
 
-  Future<Either<String, NumberVerifyRespons>> numberotpverify({
-    required String phoneNumber,
+  Future<Either<String, OtpVerifyRespons>> emailotpverify({
+    required String email,
     required String code,
     required String role,
-    Map<String, dynamic>? deviceinfo,
   }) async {
     try {
+      print(email);
+      print(code);
+      print(role);
       var response = await dio.post(
         'auth/otp/verify',
-        data: {
-          'phone': phoneNumber,
-          'code': code,
-          'role': role,
-          'deviceinfo': deviceinfo,
-        },
+
+        data: {'email': email, 'code': code, 'role': role},
       );
 
       var mapResponse = response.data as Map<String, dynamic>;
-      NumberVerifyRespons numberverifyrespons = NumberVerifyRespons.fromJson(
+      OtpVerifyRespons otpverifyrespons = OtpVerifyRespons.fromJson(
         mapResponse,
       );
 
-      return right(numberverifyrespons);
+      return right(otpverifyrespons);
     } catch (e) {
       return left(handleDioException(e));
     }

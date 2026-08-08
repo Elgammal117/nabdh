@@ -17,34 +17,34 @@ class OtpSendRespons {
 }
 
 @JsonSerializable(createJsonSchema: true)
-class NumberVerifyRespons {
+class OtpVerifyRespons {
   String? accessToken;
   String? refreshToken;
   bool? isNewUser;
   User? user;
 
-  NumberVerifyRespons({
+  OtpVerifyRespons({
     this.accessToken,
     this.refreshToken,
     this.isNewUser,
     this.user,
   });
 
-  factory NumberVerifyRespons.fromJson(Map<String, dynamic> json) =>
-      _$NumberVerifyResponsFromJson(json);
+  factory OtpVerifyRespons.fromJson(Map<String, dynamic> json) =>
+      _$OtpVerifyResponsFromJson(json);
 
-  Map<String, dynamic> toJson() => _$NumberVerifyResponsToJson(this);
+  Map<String, dynamic> toJson() => _$OtpVerifyResponsToJson(this);
 
-  static const jsonSchema = _$NumberVerifyResponsJsonSchema;
+  static const jsonSchema = _$OtpVerifyResponsJsonSchema;
 }
 
 @JsonSerializable(createJsonSchema: true)
 class User {
   String? id;
-  String? phone;
+  String? email;
   String? type;
 
-  User({this.id, this.phone, this.type});
+  User({this.id, this.email, this.type});
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 

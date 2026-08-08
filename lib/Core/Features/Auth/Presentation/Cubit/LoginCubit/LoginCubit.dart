@@ -7,25 +7,20 @@ class SigninCubit extends Cubit<SigninState> {
   SigninCubit() : super(SigninInital());
   static SigninCubit get(context) => BlocProvider.of(context);
 
-  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
 
-  Future<bool> resendOtp({
-    required String phoneNumber,
-    required String type,
-  }) async {
+  Future<bool> resendOtp({required String email, required String type}) async {
     final AuthRepo authRepo = AuthRepo();
-    final result = await authRepo.numberotpsend(
-      role: type,
-      phoneNumber: phoneNumber,
-    );
+    final result = await authRepo.emailotpsend(role: type, email: email);
 
     return result.fold((_) => false, (_) => true);
   }
 
   Future<bool> signinlogic() async {
+    print("2");
     emit(Loading());
     try {
-      return resendOtp(phoneNumber: '+20${phoneController.text}', type: type);
+      return await resendOtp(email: emailController.text, type: type);
     } finally {
       if (!isClosed) {
         emit(SigninInital());
@@ -42,7 +37,7 @@ class SigninCubit extends Cubit<SigninState> {
 
   @override
   Future<void> close() {
-    phoneController.dispose();
+    emailController.dispose();
     return super.close();
   }
 }

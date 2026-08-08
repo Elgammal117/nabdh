@@ -1,12 +1,20 @@
 import 'package:dio/dio.dart';
 
-Dio dio = Dio(BaseOptions(baseUrl: 'http://10.0.2.2:3000/api/v1/'));
+Dio dio = Dio(BaseOptions(
+  baseUrl: 'http://localhost:3000/api/v1/',
+  connectTimeout: const Duration(seconds: 30),
+  receiveTimeout: const Duration(seconds: 30),
+  sendTimeout: const Duration(seconds: 30),
+));
 String? accessToken;
 
 String handleDioException(Object e) {
   if (e is DioException) {
     final statusCode = e.response?.statusCode;
     final responseData = e.response?.data;
+    print('DioException type: ${e.type}');
+    print('DioException message: ${e.message}');
+    print('DioException error: ${e.error}');
     print('DioException status: $statusCode');
     print('DioException data: $responseData');
 

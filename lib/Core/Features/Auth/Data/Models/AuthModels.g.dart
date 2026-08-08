@@ -20,8 +20,8 @@ const _$OtpSendResponsJsonSchema = {
   },
 };
 
-NumberVerifyRespons _$NumberVerifyResponsFromJson(Map<String, dynamic> json) =>
-    NumberVerifyRespons(
+OtpVerifyRespons _$OtpVerifyResponsFromJson(Map<String, dynamic> json) =>
+    OtpVerifyRespons(
       accessToken: json['accessToken'] as String?,
       refreshToken: json['refreshToken'] as String?,
       isNewUser: json['isNewUser'] as bool?,
@@ -30,16 +30,15 @@ NumberVerifyRespons _$NumberVerifyResponsFromJson(Map<String, dynamic> json) =>
           : User.fromJson(json['user'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$NumberVerifyResponsToJson(
-  NumberVerifyRespons instance,
-) => <String, dynamic>{
-  'accessToken': instance.accessToken,
-  'refreshToken': instance.refreshToken,
-  'isNewUser': instance.isNewUser,
-  'user': instance.user,
-};
+Map<String, dynamic> _$OtpVerifyResponsToJson(OtpVerifyRespons instance) =>
+    <String, dynamic>{
+      'accessToken': instance.accessToken,
+      'refreshToken': instance.refreshToken,
+      'isNewUser': instance.isNewUser,
+      'user': instance.user,
+    };
 
-const _$NumberVerifyResponsJsonSchema = {
+const _$OtpVerifyResponsJsonSchema = {
   r'$schema': 'https://json-schema.org/draft/2020-12/schema',
   'type': 'object',
   'properties': {
@@ -53,7 +52,7 @@ const _$NumberVerifyResponsJsonSchema = {
       'type': 'object',
       'properties': {
         'id': {'type': 'string'},
-        'phone': {'type': 'string'},
+        'email': {'type': 'string'},
         'type': {'type': 'string'},
       },
     },
@@ -62,13 +61,13 @@ const _$NumberVerifyResponsJsonSchema = {
 
 User _$UserFromJson(Map<String, dynamic> json) => User(
   id: json['id'] as String?,
-  phone: json['phone'] as String?,
+  email: json['email'] as String?,
   type: json['type'] as String?,
 );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
   'id': instance.id,
-  'phone': instance.phone,
+  'email': instance.email,
   'type': instance.type,
 };
 
@@ -77,7 +76,7 @@ const _$UserJsonSchema = {
   'type': 'object',
   'properties': {
     'id': {'type': 'string'},
-    'phone': {'type': 'string'},
+    'email': {'type': 'string'},
     'type': {'type': 'string'},
   },
 };

@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
 
 class Signup extends StatefulWidget {
-  const Signup({super.key});
-
+  const Signup({super.key, required this.accessToken});
+  final String accessToken;
   @override
   State<Signup> createState() => _SignupState();
 }

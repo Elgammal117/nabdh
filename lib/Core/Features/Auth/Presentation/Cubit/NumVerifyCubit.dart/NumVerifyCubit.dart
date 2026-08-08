@@ -7,18 +7,16 @@ class NumVerifyCubit extends Cubit<NumVerifyCubitState> {
   static NumVerifyCubit get(context) => BlocProvider.of(context);
   // كان ممكن اعدل ال otpverifylogic بحيث لما اتدعيها في ال screen تاخد الرقم و كدا اقدر استخدمها في ال resend بس ال ai ليه رأي تاني
   Future<void> otpverifylogic({
-    required String phoneNumber,
+    required String email,
     required String otp,
     required String type,
-    Map<String, dynamic>? deviceinfo,
   }) async {
     emit(NumVerifyCubitLoading());
     final AuthRepo authRepo = AuthRepo();
-    final result = await authRepo.numberotpverify(
+    final result = await authRepo.emailotpverify(
       role: type,
-      phoneNumber: phoneNumber,
+      email: email,
       code: otp,
-      deviceinfo: deviceinfo,
     );
 
     result.fold(
@@ -27,9 +25,15 @@ class NumVerifyCubit extends Cubit<NumVerifyCubitState> {
           emit(NumVerifyCubitError(message: errorMessage));
         }
       },
-      (_) {
+      (otpverifyrespons) {
         if (!isClosed) {
-          emit(NumVerifyCubitSuccess(message: 'تم التحقق من الرمز بنجاح'));
+          emit(
+            NumVerifyCubitSuccess(
+              message: 'تم التحقق من الرمز بنجاح',
+              isNewUser: otpverifyrespons.isNewUser!,
+              accessToken: otpverifyrespons.accessToken!,
+            ),
+          );
         }
       },
     );
