@@ -1,20 +1,17 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/LoginCubit/LoginCubit.dart';
-import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/NumVerifyCubit.dart/NumVerifyCubit.dart';
-import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/NumVerifyCubit.dart/NumVerifyState.dart';
+import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/LoginCubit/LoginState.dart';
 import 'package:nabdh/Core/Features/Auth/Presentation/View/Sign_up.dart';
 import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
-import 'package:nabdh/Core/helper/my_navigator.dart' as my_nav;
 import 'package:nabdh/Core/helper/my_navigator.dart';
 import 'package:nabdh/Core/helper/show_snack_bar.dart';
 
-class OtpVerification extends StatefulWidget {
+class OtpVerification extends StatelessWidget {
   const OtpVerification({
     super.key,
     required this.email,
@@ -27,118 +24,72 @@ class OtpVerification extends StatefulWidget {
   final Map<String, dynamic>? deviceinfo;
 
   @override
-  State<OtpVerification> createState() => _OtpVerificationState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => SigninCubit()..startTimer(),
+      child: _OtpVerificationBody(email: email, type: type),
+    );
+  }
 }
 
-class _OtpVerificationState extends State<OtpVerification> {
-  static const int _otpLength = 6;
-  static const int _resendSeconds = 60;
-  String code = '';
+class _OtpVerificationBody extends StatelessWidget {
+  const _OtpVerificationBody({required this.email, required this.type});
 
-  final SigninCubit _signinCubit = SigninCubit();
-  final NumVerifyCubit _numVerifyCubit = NumVerifyCubit();
-
-  final List<TextEditingController> _controllers = List.generate(
-    _otpLength,
-    (_) => TextEditingController(),
-  );
-  final List<FocusNode> _focusNodes = List.generate(
-    _otpLength,
-    (_) => FocusNode(),
-  );
-
-  late int _secondsLeft;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _secondsLeft = _resendSeconds;
-    _startTimer();
-  }
-
-  void _startTimer() {
-    _timer?.cancel();
-    setState(() => _secondsLeft = _resendSeconds);
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_secondsLeft == 0) {
-        timer.cancel();
-      } else {
-        setState(() => _secondsLeft--);
-      }
-    });
-  }
-
-  String get _formattedTime {
-    final minutes = (_secondsLeft ~/ 60).toString().padLeft(2, '0');
-    final seconds = (_secondsLeft % 60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
-  }
-
-  void _onChanged(String value, int index) {
-    if (value.isNotEmpty && index < _otpLength - 1) {
-      _focusNodes[index + 1].requestFocus();
-    } else if (value.isEmpty && index > 0) {
-      _focusNodes[index - 1].requestFocus();
-    }
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    for (final c in _controllers) {
-      c.dispose();
-    }
-    for (final f in _focusNodes) {
-      f.dispose();
-    }
-    _signinCubit.close();
-    _numVerifyCubit.close();
-    super.dispose();
-  }
+  final String email;
+  final String type;
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: _signinCubit),
-        BlocProvider.value(value: _numVerifyCubit),
-      ],
-      child: BlocConsumer<NumVerifyCubit, NumVerifyCubitState>(
-        listener: (context, state) {
-          if (state is NumVerifyCubitLoading) {
-            showCustomSnackBar(
-              context,
-              text: 'جاري التحقق من الرمز',
-              status: SnackBarStatus.info,
-            );
-          } else if (state is NumVerifyCubitSuccess) {
-            showCustomSnackBar(
-              context,
-              text: state.message,
-              status: SnackBarStatus.success,
-            );
-            if (state.isNewUser) {
-              print(state.accessToken);
+    final cubit = SigninCubit.get(context);
+
+    return BlocConsumer<SigninCubit, SigninState>(
+      listener: (context, state) {
+        if (state is OtpVerifyLoading) {
+          showCustomSnackBar(
+            context,
+            text: 'جاري التحقق من الرمز',
+            status: SnackBarStatus.info,
+          );
+        } else if (state is OtpVerifySuccess) {
+          showCustomSnackBar(
+            context,
+            text: state.message,
+            status: SnackBarStatus.success,
+          );
+          if (state.isNewUser) {
+            print(state.accessToken);
+            if (type == "PATIENT") {
               goTo(
                 context,
                 page: Signup(accessToken: state.accessToken),
                 state: NavAction.pushRemove,
               );
             } else {
-              print(state.accessToken);
-
-              goTo(context, page: HomePage(), state: NavAction.pushRemove);
+              goTo(
+                context,
+                page: Signup(accessToken: state.accessToken),
+                state: NavAction.pushRemove,
+              );
             }
-          } else if (state is NumVerifyCubitError) {
-            showCustomSnackBar(
-              context,
-              text: state.message,
-              status: SnackBarStatus.fail,
-            );
+          } else {
+            print(state.accessToken);
+            goTo(context, page: HomePage(), state: NavAction.pushRemove);
           }
-        },
-        builder: (context, state) => Scaffold(
+        } else if (state is OtpVerifyError) {
+          showCustomSnackBar(
+            context,
+            text: state.message,
+            status: SnackBarStatus.fail,
+          );
+        }
+      },
+      builder: (context, state) {
+        final secondsLeft = state is OtpTimerTick
+            ? state.secondsLeft
+            : cubit.secondsLeft;
+        final formattedTime = cubit.formattedTime;
+
+        return Scaffold(
           body: ListView(
             children: [
               Padding(
@@ -207,7 +158,7 @@ class _OtpVerificationState extends State<OtpVerification> {
                             text: 'تم إرسال رمز التحقق إلى رقم الهاتف: ',
                           ),
                           TextSpan(
-                            text: widget.email,
+                            text: email,
                             style: TextStyle(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w700,
@@ -224,13 +175,13 @@ class _OtpVerificationState extends State<OtpVerification> {
                     // ---------- OTP boxes ----------
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(_otpLength, (index) {
+                      children: List.generate(SigninCubit.otpLength, (index) {
                         return SizedBox(
                           width: 50.w,
                           height: 58.h,
                           child: TextField(
-                            controller: _controllers[index],
-                            focusNode: _focusNodes[index],
+                            controller: cubit.otpControllers[index],
+                            focusNode: cubit.otpFocusNodes[index],
                             textAlign: TextAlign.center,
                             keyboardType: TextInputType.number,
                             maxLength: 1,
@@ -259,7 +210,8 @@ class _OtpVerificationState extends State<OtpVerification> {
                                 ),
                               ),
                             ),
-                            onChanged: (value) => _onChanged(value, index),
+                            onChanged: (value) =>
+                                cubit.onOtpChanged(value, index),
                           ),
                         );
                       }),
@@ -270,18 +222,17 @@ class _OtpVerificationState extends State<OtpVerification> {
                     Center(
                       child: GestureDetector(
                         onTap: () async {
-                          if (_secondsLeft > 0) {
-                            return;
-                          }
+                          if (secondsLeft > 0) return;
 
-                          final sent = await SigninCubit.get(
-                            context,
-                          ).resendOtp(email: widget.email, type: widget.type);
+                          final sent = await cubit.resendOtp(
+                            email: email,
+                            type: type,
+                          );
 
                           if (!context.mounted) return;
 
                           if (sent) {
-                            _startTimer();
+                            cubit.startTimer();
                           }
 
                           showCustomSnackBar(
@@ -298,7 +249,7 @@ class _OtpVerificationState extends State<OtpVerification> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              _formattedTime,
+                              formattedTime,
                               style: TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 14.sp,
@@ -331,13 +282,13 @@ class _OtpVerificationState extends State<OtpVerification> {
                       height: 58.h,
                       child: ElevatedButton(
                         onPressed: () {
-                          code = _controllers.map((c) => c.text).join();
+                          final code = cubit.otpCode;
                           print('this is code : $code');
-                          if (code.length < _otpLength) return;
-                          NumVerifyCubit.get(context).otpverifylogic(
-                            email: widget.email,
+                          if (code.length < SigninCubit.otpLength) return;
+                          cubit.otpverifylogic(
+                            email: email,
                             otp: code,
-                            type: widget.type,
+                            type: type,
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -347,7 +298,7 @@ class _OtpVerificationState extends State<OtpVerification> {
                           ),
                           elevation: 0,
                         ),
-                        child: state is NumVerifyCubitLoading
+                        child: state is OtpVerifyLoading
                             ? SizedBox(
                                 width: 22.w,
                                 height: 22.w,
@@ -418,8 +369,8 @@ class _OtpVerificationState extends State<OtpVerification> {
               // ---------- Logo ----------
             ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
