@@ -15,17 +15,14 @@ class OnboardingPageData {
   final String description;
 }
 
-class OnboardingFlow extends StatefulWidget {
+class OnboardingFlow extends StatelessWidget {
   const OnboardingFlow({super.key});
 
   @override
-  State<OnboardingFlow> createState() => _OnboardingFlowState();
+  Widget build(BuildContext context) => _OnboardingFlowBody();
 }
 
-class _OnboardingFlowState extends State<OnboardingFlow> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
-
+class _OnboardingFlowBody extends StatelessWidget {
   static const _pages = [
     OnboardingPageData(
       image: 'assets/LuxeHealth home nursing.png',
@@ -47,37 +44,33 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     ),
   ];
 
-  void _handleNext() {
-    if (_currentPage < _pages.length - 1) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeInOut,
-      );
-    } else {
+  @override
+  Widget build(BuildContext context) {
+    final PageController pageController = PageController();
+
+    void _handleNext() {
+      if (pageController.page! < _pages.length - 1) {
+        pageController.nextPage(
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => Signin()),
+          (route) => false,
+        );
+      }
+    }
+
+    void _handleSkip() {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => Signin()),
         (route) => false,
       );
     }
-  }
 
-  void _handleSkip() {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => Signin()),
-      (route) => false,
-    );
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -85,16 +78,15 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         body: Stack(
           children: [
             PageView.builder(
-              controller: _pageController,
+              controller: pageController,
               itemCount: _pages.length,
-              onPageChanged: (index) => setState(() => _currentPage = index),
               itemBuilder: (context, index) {
                 final page = _pages[index];
                 return OnboardingContent(
                   image: page.image,
                   title: page.title,
                   description: page.description,
-                  pageController: _pageController,
+                  pageController: pageController,
                   pageCount: _pages.length,
                   isLastPage: index == _pages.length - 1,
                   onNext: _handleNext,
