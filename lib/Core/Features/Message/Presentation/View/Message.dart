@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nabdh/Core/Features/Message/Presentation/View/Conversation.dart';
-import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 import 'package:nabdh/Core/helper/my_navigator.dart';
 
@@ -26,12 +25,7 @@ class MessageModel {
 }
 
 class MessagePage extends StatefulWidget {
-  final bool showBottomNav;
-
-  const MessagePage({
-    super.key,
-    this.showBottomNav = true,
-  });
+  const MessagePage({super.key});
 
   @override
   State<MessagePage> createState() => _MessagePageState();
@@ -39,7 +33,6 @@ class MessagePage extends StatefulWidget {
 
 class _MessagePageState extends State<MessagePage> {
   final TextEditingController _searchController = TextEditingController();
-  int _selectedNavIndex = 2; // 2 represents "الرسائل"
 
   List<MessageModel> conversations = [
     MessageModel(
@@ -146,7 +139,9 @@ class _MessagePageState extends State<MessagePage> {
                       SizedBox(height: 20.h),
 
                       // Conversations List
-                      ...conversations.map((item) => _buildConversationItem(item)),
+                      ...conversations.map(
+                        (item) => _buildConversationItem(item),
+                      ),
 
                       SizedBox(height: 20.h),
 
@@ -183,7 +178,6 @@ class _MessagePageState extends State<MessagePage> {
             ],
           ),
         ),
-        bottomNavigationBar: widget.showBottomNav ? _buildBottomNavBar() : null,
       ),
     );
   }
@@ -196,10 +190,7 @@ class _MessagePageState extends State<MessagePage> {
       ),
       child: TextField(
         controller: _searchController,
-        style: TextStyle(
-          color: AppColors.black,
-          fontSize: 14.5.sp,
-        ),
+        style: TextStyle(color: AppColors.black, fontSize: 14.5.sp),
         decoration: InputDecoration(
           hintText: 'ابحث فى المحادثات',
           hintStyle: TextStyle(
@@ -227,10 +218,7 @@ class _MessagePageState extends State<MessagePage> {
       onTap: () {
         goTo(
           context,
-          page: ConversationPage(
-            name: item.name,
-            imageUrl: item.imageUrl,
-          ),
+          page: ConversationPage(name: item.name, imageUrl: item.imageUrl),
         );
       },
       child: Container(
@@ -248,184 +236,100 @@ class _MessagePageState extends State<MessagePage> {
             ),
           ],
         ),
-      child: Row(
-        children: [
-          // Avatar
-          ClipRRect(
-            borderRadius: BorderRadius.circular(25.r),
-            child: Image.network(
-              item.imageUrl,
-              width: 50.w,
-              height: 50.w,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
+        child: Row(
+          children: [
+            // Avatar
+            ClipRRect(
+              borderRadius: BorderRadius.circular(25.r),
+              child: Image.network(
+                item.imageUrl,
                 width: 50.w,
                 height: 50.w,
-                color: const Color(0xFFEAF4F2),
-                child: Icon(
-                  Icons.person,
-                  color: AppColors.primary,
-                  size: 26.sp,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: 50.w,
+                  height: 50.w,
+                  color: const Color(0xFFEAF4F2),
+                  child: Icon(
+                    Icons.person,
+                    color: AppColors.primary,
+                    size: 26.sp,
+                  ),
                 ),
               ),
             ),
-          ),
-          SizedBox(width: 12.w),
+            SizedBox(width: 12.w),
 
-          // Name and Last Message
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // Name and Last Message
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.name,
+                    style: TextStyle(
+                      color: AppColors.black,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    item.lastMessage,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: item.isLastMessageHighlighted
+                          ? AppColors.primary
+                          : AppColors.hintGrey,
+                      fontSize: 13.5.sp,
+                      fontWeight: item.isLastMessageHighlighted
+                          ? FontWeight.w700
+                          : FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Time and Unread Badge Column
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  item.name,
+                  item.time,
                   style: TextStyle(
-                    color: AppColors.black,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w700,
+                    color: AppColors.hintGrey,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
-                SizedBox(height: 4.h),
-                Text(
-                  item.lastMessage,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: item.isLastMessageHighlighted
-                        ? AppColors.primary
-                        : AppColors.hintGrey,
-                    fontSize: 13.5.sp,
-                    fontWeight: item.isLastMessageHighlighted
-                        ? FontWeight.w700
-                        : FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Time and Unread Badge Column
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                item.time,
-                style: TextStyle(
-                  color: AppColors.hintGrey,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              if (item.unreadCount > 0) ...[
-                SizedBox(height: 6.h),
-                Container(
-                  width: 20.w,
-                  height: 20.w,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${item.unreadCount}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ],
-      ),
-    ),
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    final navItems = const [
-      _NavItemData(icon: Icons.home_outlined, label: 'الرئيسية'),
-      _NavItemData(icon: Icons.calendar_month, label: 'حجوزاتي'),
-      _NavItemData(icon: Icons.chat_bubble_outline, label: 'الرسائل'),
-      _NavItemData(icon: Icons.person_outline, label: 'حسابي'),
-    ];
-
-    return SafeArea(
-      top: false,
-      child: Container(
-        color: Colors.white,
-        padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 8.h),
-        child: SizedBox(
-          height: 56.h,
-          child: Row(
-            children: List.generate(navItems.length, (index) {
-              final navItem = navItems[index];
-              final isSelected = _selectedNavIndex == index;
-
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    if (index == 0) {
-                      goTo(
-                        context,
-                        page: const HomePage(),
-                        state: NavAction.pushRemove,
-                      );
-                    } else {
-                      setState(() {
-                        _selectedNavIndex = index;
-                      });
-                    }
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeOut,
-                    height: 56.h,
+                if (item.unreadCount > 0) ...[
+                  SizedBox(height: 6.h),
+                  Container(
+                    width: 20.w,
+                    height: 20.w,
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFEAF4F2) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(999.r),
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
                     ),
                     child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            navItem.icon,
-                            size: 22.sp,
-                            color: isSelected ? AppColors.primary : Colors.grey[500],
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            navItem.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              height: 1,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                              color: isSelected ? AppColors.primary : Colors.grey[500],
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        '${item.unreadCount}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              );
-            }),
-          ),
+                ],
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
-}
-
-class _NavItemData {
-  final IconData icon;
-  final String label;
-
-  const _NavItemData({required this.icon, required this.label});
 }

@@ -10,17 +10,13 @@ import 'package:nabdh/Core/Util/app_colors.dart';
 import 'package:nabdh/Core/helper/my_navigator.dart';
 
 class MyAccount extends StatefulWidget {
-  final bool showBottomNav;
-
-  const MyAccount({super.key, this.showBottomNav = true});
+  const MyAccount({super.key});
 
   @override
   State<MyAccount> createState() => _MyAccountState();
 }
 
 class _MyAccountState extends State<MyAccount> {
-  int _selectedNavIndex = 3;
-
   @override
   Widget build(BuildContext context) {
     Widget content = Directionality(
@@ -99,15 +95,7 @@ class _MyAccountState extends State<MyAccount> {
       ),
     );
 
-    if (!widget.showBottomNav) {
-      return content;
-    }
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(child: content),
-      bottomNavigationBar: _buildBottomNavigationBar(),
-    );
+    return content;
   }
 
   Widget _buildWelcomeCard() {
@@ -432,116 +420,4 @@ class _MyAccountState extends State<MyAccount> {
       ),
     );
   }
-
-  Widget _buildBottomNavigationBar() {
-    final navItems = const [
-      _NavItemData(icon: Icons.home_outlined, label: 'الرئيسية'),
-      _NavItemData(icon: Icons.calendar_month_outlined, label: 'حجوزاتي'),
-      _NavItemData(icon: Icons.chat_bubble_outline, label: 'الرسائل'),
-      _NavItemData(icon: Icons.person_outline, label: 'حسابي'),
-    ];
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 16,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(navItems.length, (index) {
-              final isSelected = _selectedNavIndex == index;
-              final item = navItems[index];
-
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    if (index == 0) {
-                      goTo(
-                        context,
-                        page: const HomePage(),
-                        state: NavAction.pushRemove,
-                      );
-                    } else if (index == 1) {
-                      goTo(
-                        context,
-                        page: const MyBookingPage(),
-                        state: NavAction.pushReplace,
-                      );
-                    } else if (index == 2) {
-                      goTo(
-                        context,
-                        page: const MessagePage(),
-                        state: NavAction.pushReplace,
-                      );
-                    } else {
-                      setState(() {
-                        _selectedNavIndex = index;
-                      });
-                    }
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeOut,
-                    height: 52.h,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color(0xFFC7F3EC)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(999.r),
-                    ),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            item.icon,
-                            size: 22.sp,
-                            color: isSelected
-                                ? AppColors.primary
-                                : Colors.grey[500],
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            item.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 10.sp,
-                              height: 1,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.w500,
-                              color: isSelected
-                                  ? AppColors.primary
-                                  : Colors.grey[500],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItemData {
-  final IconData icon;
-  final String label;
-
-  const _NavItemData({required this.icon, required this.label});
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nabdh/Core/Features/Auth/Presentation/View/Sign_up.dart';
 import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
 import 'package:nabdh/Core/Features/payment/Presentation/View/Payment.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
+import 'package:nabdh/Navigation.dart';
 import 'package:nabdh/Splash_Screen.dart';
 
 void main() {
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
             colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
           ),
-          home: SplashScreen(),
+          home: MainScreen(),
         );
       },
     );

@@ -31,3 +31,28 @@ class OtpVerifyError extends SigninState {
   OtpVerifyError({required this.message});
   final String message;
 }
+
+// ── Signup‑related states ──
+
+abstract class SignupState {}
+
+class SignupInitial extends SignupState {}
+
+class SignupPhotoChanged extends SignupState {
+  SignupPhotoChanged({required this.photoPath});
+  final String photoPath;
+}
+
+class SignupGenderChanged extends SignupState {
+  SignupGenderChanged({required this.gender});
+  final String gender;
+}
+
+class SignupLoading extends SignupState {}
+
+class SignupSuccess extends SignupState {}
+
+class SignupError extends SignupState {
+  SignupError({required this.message});
+  final String message;
+}

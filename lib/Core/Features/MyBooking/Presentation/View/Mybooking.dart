@@ -3,17 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nabdh/Core/Features/Message/Presentation/View/Conversation.dart';
 import 'package:nabdh/Core/Features/MyBooking/Presentation/View/BookingDetails.dart';
-import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 import 'package:nabdh/Core/helper/my_navigator.dart';
 
 class MyBookingPage extends StatefulWidget {
-  final bool showBottomNav;
-
-  const MyBookingPage({
-    super.key,
-    this.showBottomNav = true,
-  });
+  const MyBookingPage({super.key});
 
   @override
   State<MyBookingPage> createState() => _MyBookingPageState();
@@ -118,7 +112,6 @@ class _MyBookingPageState extends State<MyBookingPage> {
             ],
           ),
         ),
-        bottomNavigationBar: widget.showBottomNav ? _buildBottomNavBar() : null,
       ),
     );
   }
@@ -154,7 +147,9 @@ class _MyBookingPageState extends State<MyBookingPage> {
                     style: TextStyle(
                       color: isSelected ? Colors.white : AppColors.hintGrey,
                       fontSize: 14.sp,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
                     ),
                   ),
                 ),
@@ -277,11 +272,7 @@ class _MyBookingPageState extends State<MyBookingPage> {
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 1.5),
                       ),
-                      child: Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 9.sp,
-                      ),
+                      child: Icon(Icons.check, color: Colors.white, size: 9.sp),
                     ),
                   ),
                 ],
@@ -462,11 +453,7 @@ class _MyBookingPageState extends State<MyBookingPage> {
                 color: Color(0xFFF2F6F6),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.add,
-                color: AppColors.hintGrey,
-                size: 26.sp,
-              ),
+              child: Icon(Icons.add, color: AppColors.hintGrey, size: 26.sp),
             ),
             SizedBox(height: 12.h),
             Text(
@@ -561,90 +548,6 @@ class _MyBookingPageState extends State<MyBookingPage> {
       ),
     );
   }
-
-  Widget _buildBottomNavBar() {
-    final navItems = const [
-      _NavItemData(icon: Icons.home_outlined, label: 'الرئيسية'),
-      _NavItemData(icon: Icons.calendar_month, label: 'الحجوزات'),
-      _NavItemData(icon: Icons.chat_bubble_outline, label: 'الرسائل'),
-      _NavItemData(icon: Icons.person_outline, label: 'حسابي'),
-    ];
-
-    return SafeArea(
-      top: false,
-      child: Container(
-        color: Colors.white,
-        padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 8.h),
-        child: SizedBox(
-          height: 56.h,
-          child: Row(
-            children: List.generate(navItems.length, (index) {
-              final navItem = navItems[index];
-              final isSelected = _selectedNavIndex == index;
-
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    if (index == 0) {
-                      goTo(
-                        context,
-                        page: const HomePage(),
-                        state: NavAction.pushRemove,
-                      );
-                    } else {
-                      setState(() {
-                        _selectedNavIndex = index;
-                      });
-                    }
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeOut,
-                    height: 56.h,
-                    decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFEAF4F2) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(999.r),
-                    ),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            navItem.icon,
-                            size: 22.sp,
-                            color: isSelected ? AppColors.primary : Colors.grey[500],
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            navItem.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              height: 1,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                              color: isSelected ? AppColors.primary : Colors.grey[500],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItemData {
-  final IconData icon;
-  final String label;
-
-  const _NavItemData({required this.icon, required this.label});
 }
 
 class _DashedBorderPainter extends CustomPainter {

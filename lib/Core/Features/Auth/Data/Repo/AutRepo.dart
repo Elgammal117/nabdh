@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:nabdh/Core/Features/Auth/Data/Models/AuthModels.dart';
 import 'package:nabdh/dio_helper.dart';
 
@@ -67,6 +70,52 @@ class AuthRepo {
       );
 
       return right(refreshtokkenrespons);
+    } catch (e) {
+      return left(handleDioException(e));
+    }
+  }
+
+  Future<Either<String, SignUpRespons>> SignUp({
+    required String accessToken,
+    required String fullName,
+    required String gender,
+    required String dateOfBirth,
+    required String profilePhoto,
+  }) async {
+    try {
+      var response = await dio.post(
+        'patient/profile',
+        data: {
+          'fullName': fullName,
+          'gender': gender,
+          'dateOfBirth': dateOfBirth,
+          'photoUrl': profilePhoto,
+        },
+        options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
+      );
+
+      var mapResponse = response.data as Map<String, dynamic>;
+      SignUpRespons signUpRespons = SignUpRespons.fromJson(mapResponse);
+
+      return right(signUpRespons);
+    } catch (e) {
+      return left(handleDioException(e));
+    }
+  }
+
+  Future<Either<String, SignUpRespons>> getuser({
+    required String accessToken,
+  }) async {
+    try {
+      var response = await dio.get(
+        'patient/profile',
+        options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
+      );
+
+      var mapResponse = response.data as Map<String, dynamic>;
+      SignUpRespons signUpRespons = SignUpRespons.fromJson(mapResponse);
+
+      return right(signUpRespons);
     } catch (e) {
       return left(handleDioException(e));
     }

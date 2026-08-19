@@ -103,3 +103,45 @@ const _$RefreshTokkenResponsJsonSchema = {
     'refreshToken': {'type': 'string'},
   },
 };
+
+SignUpRespons _$SignUpResponsFromJson(Map<String, dynamic> json) =>
+    SignUpRespons(
+      sId: json['_id'] as String?,
+      userId: json['userId'] as String?,
+      iV: (json['__v'] as num?)?.toInt(),
+      createdAt: json['createdAt'] as String?,
+      dateOfBirth: json['dateOfBirth'] as String?,
+      fullName: json['fullName'] as String?,
+      gender: json['gender'] as String?,
+      photoUrl: json['photoUrl'] as String?,
+      updatedAt: json['updatedAt'] as String?,
+    );
+
+Map<String, dynamic> _$SignUpResponsToJson(SignUpRespons instance) =>
+    <String, dynamic>{
+      '_id': instance.sId,
+      'userId': instance.userId,
+      '__v': instance.iV,
+      'createdAt': instance.createdAt,
+      'dateOfBirth': instance.dateOfBirth,
+      'fullName': instance.fullName,
+      'gender': instance.gender,
+      'photoUrl': instance.photoUrl,
+      'updatedAt': instance.updatedAt,
+    };
+
+const _$SignUpResponsJsonSchema = {
+  r'$schema': 'https://json-schema.org/draft/2020-12/schema',
+  'type': 'object',
+  'properties': {
+    '_id': {'type': 'string'},
+    'userId': {'type': 'string'},
+    '__v': {'type': 'integer'},
+    'createdAt': {'type': 'string'},
+    'dateOfBirth': {'type': 'string'},
+    'fullName': {'type': 'string'},
+    'gender': {'type': 'string'},
+    'photoUrl': {'type': 'string'},
+    'updatedAt': {'type': 'string'},
+  },
+};

@@ -1,330 +1,460 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
+import 'dart:io';
 
-class Signup extends StatefulWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/LoginCubit/LoginCubit.dart';
+import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/LoginCubit/LoginState.dart';
+import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
+import 'package:nabdh/Core/Util/app_colors.dart';
+import 'package:nabdh/Core/helper/my_navigator.dart';
+import 'package:nabdh/dio_helper.dart';
+
+class Signup extends StatelessWidget {
   const Signup({super.key, required this.accessToken});
+
   final String accessToken;
+
   @override
-  State<Signup> createState() => _SignupState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => SignupCubit(accessToken: accessToken),
+      child: _SignupView(accessToken: accessToken),
+    );
+  }
 }
 
-class _SignupState extends State<Signup> {
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
+class _SignupView extends StatelessWidget {
+  const _SignupView({required this.accessToken});
 
-  static const Color primaryTeal = Color(0xFF00685F);
-  static const Color backgroundGrey = Color(0xFFF7F8FA);
-  static const Color borderGrey = Color(0xFFE3E6EA);
-  static const Color hintGrey = Color(0xFF3E4947);
-
-  String selectedGender = 'male'; // 'male' or 'female'
+  final String accessToken;
 
   @override
-  void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    final cubit = SignupCubit.get(context);
+
+    return BlocConsumer<SignupCubit, SignupState>(
+      listener: (context, state) {
+        if (state is SignupSuccess) {
+          goTo(
+            context,
+            page: const HomePage(),
+            state: NavAction.pushRemove,
+          );
+        } else if (state is SignupError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+          );
+        }
+      },
+      builder: (context, state) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            body: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                Padding(
+                  padding: REdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'NABDH',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.arrow_forward,
+                          color: Colors.black87,
+                          size: 24.sp,
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Title ──
+                      Text(
+                        'إنشاء حساب جديد',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 30.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        'ابدأ رحلتك معنا للوصول إلى خدمات تمريضية منزلية موثوقة وآمنة.',
+                        style: TextStyle(
+                          color: AppColors.hintGrey,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      SizedBox(height: 28.h),
+
+                      // ── Profile Photo Picker ──
+                      _PhotoPickerWidget(cubit: cubit, state: state),
+                      SizedBox(height: 28.h),
+
+                      // ── First Name ──
+                      _FieldLabel('الاسم الأول'),
+                      SizedBox(height: 8.h),
+                      _InputField(
+                        controller: cubit.firstNameController,
+                        hint: 'أدخل اسمك الأول',
+                        icon: Icons.person,
+                      ),
+                      SizedBox(height: 18.h),
+
+                      // ── Last Name ──
+                      _FieldLabel('الاسم الأخير'),
+                      SizedBox(height: 8.h),
+                      _InputField(
+                        controller: cubit.lastNameController,
+                        hint: 'أدخل اسمك الأخير',
+                        icon: Icons.person_outline,
+                      ),
+                      SizedBox(height: 24.h),
+
+                      // ── Gender ──
+                      _FieldLabel('الجنس'),
+                      SizedBox(height: 12.h),
+                      _GenderSelector(cubit: cubit, state: state),
+                      SizedBox(height: 40.h),
+
+                      // ── Continue Button ──
+                      _ContinueButton(cubit: cubit, state: state),
+                      SizedBox(height: 32.h),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Profile Photo Picker Widget
+// ─────────────────────────────────────────────
+class _PhotoPickerWidget extends StatelessWidget {
+  const _PhotoPickerWidget({required this.cubit, required this.state});
+
+  final SignupCubit cubit;
+  final SignupState state;
+
+  void _showPickerSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (_) => SafeArea(
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: 12.h),
+              Container(
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: AppColors.borderGrey,
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'اختر صورة',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 12.h),
+              ListTile(
+                leading: Icon(Icons.camera_alt, color: AppColors.primary),
+                title: Text('الكاميرا', style: TextStyle(fontSize: 15.sp)),
+                onTap: () {
+                  Navigator.pop(context);
+                  cubit.pickPhoto(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_library, color: AppColors.primary),
+                title: Text('المعرض', style: TextStyle(fontSize: 15.sp)),
+                onTap: () {
+                  Navigator.pop(context);
+                  cubit.pickPhoto(ImageSource.gallery);
+                },
+              ),
+              SizedBox(height: 8.h),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        body: ListView(
+    final hasPhoto = state is SignupPhotoChanged && cubit.profilePhoto != null;
+
+    return Center(
+      child: GestureDetector(
+        onTap: () => _showPickerSheet(context),
+        child: Stack(
           children: [
-            // ---------- Back Button and Logo Header ----------
-            Padding(
-              padding: REdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'NABDH',
-                    style: TextStyle(
-                      color: primaryTeal,
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
+            // Avatar circle
+            Container(
+              width: 100.w,
+              height: 100.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey[200],
+                border: Border.all(color: AppColors.primary, width: 2),
+                image: hasPhoto
+                    ? DecorationImage(
+                        image: FileImage(cubit.profilePhoto!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: hasPhoto
+                  ? null
+                  : Icon(
+                      Icons.person,
+                      size: 50.sp,
+                      color: Colors.grey.withOpacity(0.5),
                     ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.arrow_forward,
-                      color: Colors.black87,
-                      size: 24.sp,
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
+            ),
+            // Camera badge
+            Positioned(
+              bottom: 0,
+              left: 0,
+              child: Container(
+                width: 30.w,
+                height: 30.w,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primary,
+                ),
+                child: Icon(Icons.camera_alt, size: 16.sp, color: Colors.white),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'إنشاء حساب جديد',
-                    style: TextStyle(
-                      color: primaryTeal,
-                      fontSize: 30.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-
-                  // ---------- Subtitle ----------
-                  Text(
-                    'ابدأ رحلتك معنا بيقش للوصول إلى خدمات\nتمريضية منزلية موثوقة وآمنة.',
-                    style: TextStyle(
-                      color: hintGrey,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  SizedBox(height: 20.h),
-
-                  // ---------- First Name Label ----------
-                  Text(
-                    'الاسم الأول',
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: primaryTeal,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-
-                  // ---------- First Name Field ----------
-                  TextFormField(
-                    controller: _firstNameController,
-                    textDirection: TextDirection.rtl,
-                    decoration: InputDecoration(
-                      hintText: 'أدخل اسمك الأول',
-                      hintStyle: TextStyle(color: hintGrey, fontSize: 14.sp),
-                      prefixIcon: Icon(Icons.person, color: hintGrey),
-
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(
-                          color: Color(0xffBEC9C6).withOpacity(0.6),
-                          width: 1.5,
-                        ),
-                      ),
-
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(
-                          color: primaryTeal, // color when clicking
-                          width: 1.5,
-                        ),
-                      ),
-
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 12.h,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 18.h),
-
-                  // ---------- Last Name Label ----------
-                  Text(
-                    'الاسم الأخير',
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: primaryTeal,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-
-                  // ---------- Last Name Field ----------
-                  TextFormField(
-                    controller: _lastNameController,
-                    textDirection: TextDirection.rtl,
-                    decoration: InputDecoration(
-                      hintText: 'أدخل اسمك الأخير',
-                      hintStyle: TextStyle(color: hintGrey, fontSize: 14.sp),
-                      prefixIcon: Icon(Icons.person, color: hintGrey),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(
-                          color: Color(0xffBEC9C6).withOpacity(0.6),
-                          width: 1.5,
-                        ),
-                      ),
-
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(
-                          color: Color(0xffBEC9C6).withOpacity(0.6),
-                          width: 1.5,
-                        ),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 12.h,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 34.h),
-
-                  // ---------- Gender Label ----------
-                  Text(
-                    'الجنس',
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: primaryTeal,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-
-                  // ---------- Gender Selection Buttons ----------
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.r),
-                      color: backgroundGrey,
-                    ),
-                    height: 50.h,
-                    width: double.infinity,
-                    child: Padding(
-                      padding: EdgeInsets.all(4.0.r),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // Male Button
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  selectedGender = 'male';
-                                });
-                              },
-                              child: Container(
-                                height: 40.h,
-                                decoration: BoxDecoration(
-                                  color: selectedGender == 'male'
-                                      ? primaryTeal
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'ذكر',
-                                    style: TextStyle(
-                                      color: selectedGender == 'male'
-                                          ? Colors.white
-                                          : hintGrey,
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
-                          // Female Button
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  selectedGender = 'female';
-                                });
-                              },
-                              child: Container(
-                                height: 40.h,
-                                decoration: BoxDecoration(
-                                  color: selectedGender == 'female'
-                                      ? primaryTeal
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'أنثى',
-                                    style: TextStyle(
-                                      color: selectedGender == 'female'
-                                          ? Colors.white
-                                          : hintGrey,
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 200.h),
-
-                  // ---------- Continue Button ----------
-                  GestureDetector(
-                    onTap: () {
-                      // Handle continue action
-                      if (_firstNameController.text.isEmpty ||
-                          _lastNameController.text.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('يرجى ملء جميع الحقول'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomePage()),
-                        );
-                        // Navigate to next screen
-                        print('First Name: ${_firstNameController.text}');
-                        print('Last Name: ${_lastNameController.text}');
-                        print('Gender: $selectedGender');
-                      }
-                    },
-                    child: Container(
-                      height: 60.h,
-                      decoration: BoxDecoration(
-                        color: primaryTeal,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'متابعة',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
-                          Icon(
-                            Icons.arrow_forward,
-                            color: Colors.white,
-                            size: 20.sp,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // ---------- Title ----------
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Gender Selector Widget
+// ─────────────────────────────────────────────
+class _GenderSelector extends StatelessWidget {
+  const _GenderSelector({required this.cubit, required this.state});
+
+  final SignupCubit cubit;
+  final SignupState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final gender = cubit.selectedGender;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.r),
+        color: Colors.grey[200],
+      ),
+      height: 50.h,
+      width: double.infinity,
+      padding: EdgeInsets.all(4.r),
+      child: Row(
+        children: [
+          _GenderButton(
+            label: 'ذكر',
+            value: 'male',
+            selected: gender == 'male',
+            onTap: () => cubit.setGender('male'),
+          ),
+          SizedBox(width: 8.w),
+          _GenderButton(
+            label: 'أنثى',
+            value: 'female',
+            selected: gender == 'female',
+            onTap: () => cubit.setGender('female'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GenderButton extends StatelessWidget {
+  const _GenderButton({
+    required this.label,
+    required this.value,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final String value;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          height: 40.h,
+          decoration: BoxDecoration(
+            color: selected ? AppColors.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: selected ? Colors.white : AppColors.hintGrey,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Continue Button
+// ─────────────────────────────────────────────
+class _ContinueButton extends StatelessWidget {
+  const _ContinueButton({required this.cubit, required this.state});
+
+  final SignupCubit cubit;
+  final SignupState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final isLoading = state is SignupLoading;
+
+    return SizedBox(
+      width: double.infinity,
+      height: 60.h,
+      child: ElevatedButton(
+        onPressed: isLoading ? null : () => cubit.SignUpLogic(context),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          elevation: 0,
+        ),
+        child: isLoading
+            ? SizedBox(
+                width: 22.w,
+                height: 22.w,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'متابعة',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Icon(Icons.arrow_forward, color: Colors.white, size: 20.sp),
+                ],
+              ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Shared helpers
+// ─────────────────────────────────────────────
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Text(
+    text,
+    style: TextStyle(
+      color: AppColors.primary,
+      fontSize: 14.sp,
+      fontWeight: FontWeight.w600,
+    ),
+  );
+}
+
+class _InputField extends StatelessWidget {
+  const _InputField({
+    required this.controller,
+    required this.hint,
+    required this.icon,
+  });
+
+  final TextEditingController controller;
+  final String hint;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      textDirection: TextDirection.rtl,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(color: AppColors.hintGrey, fontSize: 14.sp),
+        prefixIcon: Icon(icon, color: AppColors.hintGrey),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide(
+            color: const Color(0xffBEC9C6).withOpacity(0.6),
+            width: 1.5,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       ),
     );
   }

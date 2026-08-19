@@ -157,7 +157,6 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
             ],
           ),
         ),
-        bottomNavigationBar: widget.showBottomNav ? _buildBottomNavBar() : null,
       ),
     );
   }
@@ -654,96 +653,4 @@ class _BookingDetailsPageState extends State<BookingDetailsPage> {
       ),
     );
   }
-
-  Widget _buildBottomNavBar() {
-    final navItems = const [
-      _NavItemData(icon: Icons.home_outlined, label: 'الرئيسية'),
-      _NavItemData(icon: Icons.calendar_month, label: 'الحجوزات'),
-      _NavItemData(icon: Icons.chat_bubble_outline, label: 'الرسائل'),
-      _NavItemData(icon: Icons.person_outline, label: 'حسابي'),
-    ];
-
-    return SafeArea(
-      top: false,
-      child: Container(
-        color: Colors.white,
-        padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 8.h),
-        child: SizedBox(
-          height: 56.h,
-          child: Row(
-            children: List.generate(navItems.length, (index) {
-              final navItem = navItems[index];
-              final isSelected = _selectedNavIndex == index;
-
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    if (index == 0) {
-                      goTo(
-                        context,
-                        page: const HomePage(),
-                        state: NavAction.pushRemove,
-                      );
-                    } else {
-                      setState(() {
-                        _selectedNavIndex = index;
-                      });
-                    }
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeOut,
-                    height: 56.h,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color(0xFFEAF4F2)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(999.r),
-                    ),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            navItem.icon,
-                            size: 22.sp,
-                            color: isSelected
-                                ? AppColors.primary
-                                : Colors.grey[500],
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            navItem.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              height: 1,
-                              fontWeight: isSelected
-                                  ? FontWeight.w700
-                                  : FontWeight.w500,
-                              color: isSelected
-                                  ? AppColors.primary
-                                  : Colors.grey[500],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItemData {
-  final IconData icon;
-  final String label;
-
-  const _NavItemData({required this.icon, required this.label});
 }

@@ -66,3 +66,37 @@ class RefreshTokkenRespons {
 
   static const jsonSchema = _$RefreshTokkenResponsJsonSchema;
 }
+
+@JsonSerializable(createJsonSchema: true)
+class SignUpRespons {
+  @JsonKey(name: '_id')
+  String? sId;
+  String? userId;
+  @JsonKey(name: '__v')
+  int? iV;
+  String? createdAt;
+  String? dateOfBirth;
+  String? fullName;
+  String? gender;
+  String? photoUrl;
+  String? updatedAt;
+
+  SignUpRespons({
+    this.sId,
+    this.userId,
+    this.iV,
+    this.createdAt,
+    this.dateOfBirth,
+    this.fullName,
+    this.gender,
+    this.photoUrl,
+    this.updatedAt,
+  });
+
+  factory SignUpRespons.fromJson(Map<String, dynamic> json) =>
+      _$SignUpResponsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SignUpResponsToJson(this);
+
+  static const jsonSchema = _$SignUpResponsJsonSchema;
+}

@@ -57,14 +57,7 @@ class _OtpVerificationBody extends StatelessWidget {
             status: SnackBarStatus.success,
           );
           if (state.isNewUser) {
-            print(state.accessToken);
             if (type == "PATIENT") {
-              goTo(
-                context,
-                page: Signup(accessToken: state.accessToken),
-                state: NavAction.pushRemove,
-              );
-            } else {
               goTo(
                 context,
                 page: Signup(accessToken: state.accessToken),
@@ -72,10 +65,13 @@ class _OtpVerificationBody extends StatelessWidget {
               );
             }
           } else {
-            print(state.accessToken);
-            goTo(context, page: HomePage(), state: NavAction.pushRemove);
+            goTo(
+              context,
+              page: const HomePage(),
+              state: NavAction.pushRemove,
+            );
           }
-        } else if (state is OtpVerifyError) {
+        } else if (state is Error) {
           showCustomSnackBar(
             context,
             text: state.message,

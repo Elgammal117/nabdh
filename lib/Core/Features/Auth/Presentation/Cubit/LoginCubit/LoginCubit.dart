@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:nabdh/Core/Features/Auth/Data/Models/AuthModels.dart';
 import 'package:nabdh/Core/Features/Auth/Data/Repo/AutRepo.dart';
 import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/LoginCubit/LoginState.dart';
 
@@ -81,7 +84,7 @@ class SigninCubit extends Cubit<SigninState> {
     result.fold(
       (errorMessage) {
         if (!isClosed) {
-          emit(OtpVerifyError(message: errorMessage));
+          emit(Error(message: errorMessage));
         }
       },
       (otpverifyrespons) {
@@ -132,6 +135,122 @@ class SigninCubit extends Cubit<SigninState> {
   Future<void> close() {
     _timer?.cancel();
     emailController.dispose();
+    return super.close();
+  }
+
+  static SignUpRespons? cachedUser;
+
+  Future<SignUpRespons?> getuser({
+    required String accessToken,
+    bool forceRefresh = false,
+  }) async {
+    if (!forceRefresh && cachedUser != null) {
+      return cachedUser;
+    }
+
+    try {
+      final AuthRepo authRepo = AuthRepo();
+      final result = await authRepo.getuser(accessToken: accessToken);
+      return result.fold(
+        (errorMessage) {
+          if (!isClosed) {
+            emit(Error(message: errorMessage));
+          }
+          return null;
+        },
+        (signUpRespons) {
+          cachedUser = signUpRespons;
+          return signUpRespons;
+        },
+      );
+    } catch (e) {
+      if (!isClosed) {
+        emit(Error(message: e.toString()));
+      }
+    }
+    return null;
+  }
+}
+
+// ── Signup Cubit ──
+class SignupCubit extends Cubit<SignupState> {
+  SignupCubit({required this.accessToken}) : super(SignupInitial());
+
+  static SignupCubit get(context) => BlocProvider.of(context);
+
+  final String accessToken;
+
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
+
+  String selectedGender = 'male';
+  File? profilePhoto;
+
+  final ImagePicker _picker = ImagePicker();
+
+  void setGender(String gender) {
+    selectedGender = gender;
+    emit(SignupGenderChanged(gender: gender));
+  }
+
+  Future<void> pickPhoto(ImageSource source) async {
+    final XFile? picked = await _picker.pickImage(
+      source: source,
+      imageQuality: 80,
+      maxWidth: 800,
+    );
+    if (picked != null) {
+      profilePhoto = File(picked.path);
+      emit(SignupPhotoChanged(photoPath: picked.path));
+    }
+  }
+
+  Future<void> SignUpLogic(BuildContext context) async {
+    final firstName = firstNameController.text.trim();
+    final lastName = lastNameController.text.trim();
+
+    if (firstName.isEmpty || lastName.isEmpty) {
+      emit(SignupError(message: 'يرجى ملء جميع الحقول'));
+      return;
+    }
+
+    // TODO: call your API here with accessToken, firstName, lastName,
+    //       selectedGender, and profilePhoto
+    print('First Name: $firstName');
+    print('Last Name: $lastName');
+    print('Gender: $selectedGender');
+    print('Photo: ${profilePhoto?.path}');
+    print('Token: $accessToken');
+    emit(SignupLoading());
+
+    try {
+      final AuthRepo authRepo = AuthRepo();
+      final result = await authRepo.SignUp(
+        accessToken: accessToken,
+        fullName: '$firstName $lastName',
+        gender: selectedGender,
+        dateOfBirth: '',
+        profilePhoto: profilePhoto?.path ?? '',
+      );
+      result.fold(
+        (errorMessage) {
+          if (!isClosed) {
+            emit(SignupError(message: errorMessage));
+          }
+        },
+        (signUpRespons) {
+          if (!isClosed) {
+            emit(SignupSuccess());
+          }
+        },
+      );
+    } catch (e) {}
+  }
+
+  @override
+  Future<void> close() {
+    firstNameController.dispose();
+    lastNameController.dispose();
     return super.close();
   }
 }
