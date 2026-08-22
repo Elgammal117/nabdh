@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:nabdh/Core/Features/Auth/Data/Models/AuthModels.dart';
 import 'package:nabdh/Core/Features/Auth/Data/Repo/AutRepo.dart';
 import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/LoginCubit/LoginState.dart';
+import 'dart:convert';
 
 class SigninCubit extends Cubit<SigninState> {
   SigninCubit() : super(SigninInital());
@@ -183,10 +184,21 @@ class SignupCubit extends Cubit<SignupState> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
 
-  String selectedGender = 'male';
+  String selectedGender = 'MALE';
   File? profilePhoto;
-
+  String? base64Image;
+  DateTime? selectedDate;
   final ImagePicker _picker = ImagePicker();
+
+  void setDateOfBirth(DateTime date) {
+    selectedDate = date;
+    emit(SignupDateChanged(date: date));
+  }
+
+  Future<String> imageToBase64(XFile image) async {
+    final bytes = await image.readAsBytes();
+    return base64Encode(bytes);
+  }
 
   void setGender(String gender) {
     selectedGender = gender;
@@ -200,6 +212,8 @@ class SignupCubit extends Cubit<SignupState> {
       maxWidth: 800,
     );
     if (picked != null) {
+      base64Image = await imageToBase64(picked);
+
       profilePhoto = File(picked.path);
       emit(SignupPhotoChanged(photoPath: picked.path));
     }
@@ -214,12 +228,17 @@ class SignupCubit extends Cubit<SignupState> {
       return;
     }
 
+    if (selectedDate == null) {
+      emit(SignupError(message: 'يرجى إدخال تاريخ الميلاد'));
+      return;
+    }
+
     // TODO: call your API here with accessToken, firstName, lastName,
     //       selectedGender, and profilePhoto
     print('First Name: $firstName');
     print('Last Name: $lastName');
     print('Gender: $selectedGender');
-    print('Photo: ${profilePhoto?.path}');
+    print('Photo: $base64Image');
     print('Token: $accessToken');
     emit(SignupLoading());
 
@@ -229,8 +248,9 @@ class SignupCubit extends Cubit<SignupState> {
         accessToken: accessToken,
         fullName: '$firstName $lastName',
         gender: selectedGender,
-        dateOfBirth: '',
-        profilePhoto: profilePhoto?.path ?? '',
+        dateOfBirth:
+            '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}',
+        profilePhoto: base64Image ?? '',
       );
       result.fold(
         (errorMessage) {
@@ -244,7 +264,11 @@ class SignupCubit extends Cubit<SignupState> {
           }
         },
       );
-    } catch (e) {}
+    } catch (e) {
+      if (!isClosed) {
+        emit(SignupError(message: e.toString()));
+      }
+    }
   }
 
   @override

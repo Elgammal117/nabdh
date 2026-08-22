@@ -27,8 +27,8 @@ class OtpVerifySuccess extends SigninState {
   final String accessToken;
 }
 
-class OtpVerifyError extends SigninState {
-  OtpVerifyError({required this.message});
+class Error extends SigninState {
+  Error({required this.message});
   final String message;
 }
 
@@ -46,6 +46,11 @@ class SignupPhotoChanged extends SignupState {
 class SignupGenderChanged extends SignupState {
   SignupGenderChanged({required this.gender});
   final String gender;
+}
+
+class SignupDateChanged extends SignupState {
+  SignupDateChanged({required this.date});
+  final DateTime date;
 }
 
 class SignupLoading extends SignupState {}

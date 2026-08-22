@@ -6,10 +6,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/LoginCubit/LoginCubit.dart';
 import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/LoginCubit/LoginState.dart';
 import 'package:nabdh/Core/Features/Auth/Presentation/View/Sign_up.dart';
-import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
+import 'package:nabdh/Core/Features/request_service/Presentation/View/UserHome.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 import 'package:nabdh/Core/helper/my_navigator.dart';
 import 'package:nabdh/Core/helper/show_snack_bar.dart';
+import 'package:nabdh/Navigation.dart';
 
 class OtpVerification extends StatelessWidget {
   const OtpVerification({
@@ -43,7 +44,7 @@ class _OtpVerificationBody extends StatelessWidget {
     final cubit = SigninCubit.get(context);
 
     return BlocConsumer<SigninCubit, SigninState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is OtpVerifyLoading) {
           showCustomSnackBar(
             context,
@@ -57,6 +58,10 @@ class _OtpVerificationBody extends StatelessWidget {
             status: SnackBarStatus.success,
           );
           if (state.isNewUser) {
+            print(state.accessToken);
+            print("is new user");
+
+            print(state.isNewUser);
             if (type == "PATIENT") {
               goTo(
                 context,
@@ -65,11 +70,15 @@ class _OtpVerificationBody extends StatelessWidget {
               );
             }
           } else {
-            goTo(
-              context,
-              page: const HomePage(),
-              state: NavAction.pushRemove,
-            );
+            final cubit = SigninCubit.get(context);
+            final user = await cubit.getuser(accessToken: state.accessToken);
+            if (user != null && context.mounted) {
+              goTo(
+                context,
+                page: MainScreen(accessToken: state.accessToken),
+                state: NavAction.pushRemove,
+              );
+            }
           }
         } else if (state is Error) {
           showCustomSnackBar(

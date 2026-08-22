@@ -3,11 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nabdh/Core/Features/Message/Presentation/View/Message.dart';
 import 'package:nabdh/Core/Features/MyAccount/Presentation/View/MyAccount.dart';
 import 'package:nabdh/Core/Features/MyBooking/Presentation/View/Mybooking.dart';
-import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
+import 'package:nabdh/Core/Features/request_service/Presentation/View/UserHome.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final String? accessToken;
+  const MainScreen({super.key, this.accessToken});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -22,12 +23,18 @@ class _MainScreenState extends State<MainScreen> {
     _NavItemData(icon: Icons.calendar_month, label: 'الحجوزات'),
     _NavItemData(icon: Icons.home, label: 'الرئيسية'),
   ];
-  final List<Widget> pages = const [
-    MyAccount(),
-    MessagePage(),
-    MyBookingPage(),
-    HomePage(),
-  ];
+  late final List<Widget> pages;
+
+  @override
+  void initState() {
+    super.initState();
+    pages = [
+      const MyAccount(),
+      const MessagePage(),
+      const MyBookingPage(),
+      HomePage(accessToken: widget.accessToken!),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {

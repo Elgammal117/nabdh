@@ -6,9 +6,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/LoginCubit/LoginCubit.dart';
 import 'package:nabdh/Core/Features/Auth/Presentation/Cubit/LoginCubit/LoginState.dart';
-import 'package:nabdh/Core/Features/home/Presentation/View/UserHome.dart';
+import 'package:nabdh/Core/Features/request_service/Presentation/View/UserHome.dart';
 import 'package:nabdh/Core/Util/app_colors.dart';
 import 'package:nabdh/Core/helper/my_navigator.dart';
+import 'package:nabdh/Core/helper/show_snack_bar.dart';
+import 'package:nabdh/Navigation.dart';
 import 'package:nabdh/dio_helper.dart';
 
 class Signup extends StatelessWidget {
@@ -39,12 +41,14 @@ class _SignupView extends StatelessWidget {
         if (state is SignupSuccess) {
           goTo(
             context,
-            page: const HomePage(),
+            page: MainScreen(accessToken: accessToken),
             state: NavAction.pushRemove,
           );
         } else if (state is SignupError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+          showCustomSnackBar(
+            context,
+            text: state.message,
+            status: SnackBarStatus.fail,
           );
         }
       },
@@ -134,6 +138,12 @@ class _SignupView extends StatelessWidget {
                       _FieldLabel('الجنس'),
                       SizedBox(height: 12.h),
                       _GenderSelector(cubit: cubit, state: state),
+                      SizedBox(height: 24.h),
+
+                      // ── Date of Birth ──
+                      _FieldLabel('تاريخ الميلاد'),
+                      SizedBox(height: 8.h),
+                      _DatePickerField(cubit: cubit),
                       SizedBox(height: 40.h),
 
                       // ── Continue Button ──
@@ -293,16 +303,16 @@ class _GenderSelector extends StatelessWidget {
         children: [
           _GenderButton(
             label: 'ذكر',
-            value: 'male',
-            selected: gender == 'male',
-            onTap: () => cubit.setGender('male'),
+            value: 'MALE',
+            selected: gender == 'MALE',
+            onTap: () => cubit.setGender('MALE'),
           ),
           SizedBox(width: 8.w),
           _GenderButton(
             label: 'أنثى',
-            value: 'female',
-            selected: gender == 'female',
-            onTap: () => cubit.setGender('female'),
+            value: 'FEMALE',
+            selected: gender == 'FEMALE',
+            onTap: () => cubit.setGender('FEMALE'),
           ),
         ],
       ),
@@ -455,6 +465,89 @@ class _InputField extends StatelessWidget {
           borderSide: BorderSide(color: AppColors.primary, width: 1.5),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Date Picker Field Widget
+// ─────────────────────────────────────────────
+class _DatePickerField extends StatefulWidget {
+  const _DatePickerField({required this.cubit});
+  final SignupCubit cubit;
+
+  @override
+  State<_DatePickerField> createState() => _DatePickerFieldState();
+}
+
+class _DatePickerFieldState extends State<_DatePickerField> {
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: widget.cubit.selectedDate ?? DateTime(now.year - 20),
+      firstDate: DateTime(1900),
+      lastDate: now,
+      helpText: 'اختر تاريخ الميلاد',
+      cancelText: 'إلغاء',
+      confirmText: 'تأكيد',
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: ColorScheme.light(
+            primary: AppColors.primary,
+            onSurface: Colors.black87,
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) {
+      widget.cubit.setDateOfBirth(picked);
+      setState(() {});
+    }
+  }
+
+  String _format(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')} / ${d.month.toString().padLeft(2, '0')} / ${d.year}';
+
+  @override
+  Widget build(BuildContext context) {
+    final date = widget.cubit.selectedDate;
+    return GestureDetector(
+      onTap: _pickDate,
+      child: Container(
+        height: 54.h,
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: date != null
+                ? AppColors.primary
+                : const Color(0xffBEC9C6).withOpacity(0.6),
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.calendar_today_outlined,
+              color: date != null ? AppColors.primary : AppColors.hintGrey,
+              size: 20.sp,
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                date != null ? _format(date) : 'اختر تاريخ الميلاد',
+                style: TextStyle(
+                  color: date != null ? Colors.black87 : AppColors.hintGrey,
+                  fontSize: 14.sp,
+                ),
+              ),
+            ),
+            Icon(Icons.arrow_drop_down, color: AppColors.hintGrey, size: 24.sp),
+          ],
+        ),
       ),
     );
   }
